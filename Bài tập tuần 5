@@ -1,0 +1,47 @@
+#include <iostream>
+#include <vector>
+#include <string>
+
+using namespace std;
+
+// Hàm sắp xếp các màu (đỏ -> 0, trắng -> 1, xanh -> 2)
+void sortColors(vector<int>& arr) {
+    int low = 0, mid = 0;
+    int high = arr.size() - 1;
+    
+    while (mid <= high) {
+        if (arr[mid] == 0) {  // Màu đỏ (0)
+            swap(arr[low], arr[mid]);
+            low++;
+            mid++;
+        } else if (arr[mid] == 1) {  // Màu trắng (1)
+            mid++;
+        } else {  // Màu xanh (2)
+            swap(arr[mid], arr[high]);
+            high--;
+        }
+    }
+}
+
+int main() {
+    // Mã hóa các màu: đỏ -> 0, trắng -> 1, xanh -> 2
+    vector<int> arr = {2, 0, 2, 0, 0, 1, 0, 2, 1};
+    
+    // Gọi hàm sắp xếp
+    sortColors(arr);
+    
+    // Giải mã kết quả: 0 -> đỏ, 1 -> trắng, 2 -> xanh
+    vector<string> colorMap = {"đỏ", "trắng", "xanh"};
+    
+    // In kết quả sau khi sắp xếp
+    cout << "{";
+    for (int i = 0; i < arr.size(); i++) {
+        cout << colorMap[arr[i]];
+        if (i != arr.size() - 1) {
+            cout << ", ";
+        }
+    }
+    cout << "}" << endl;
+
+    return 0;
+}
