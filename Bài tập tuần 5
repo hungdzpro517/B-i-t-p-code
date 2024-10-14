@@ -1,24 +1,25 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <algorithm>
 
 using namespace std;
-
-// Hàm sắp xếp các màu (đỏ -> 0, trắng -> 1, xanh -> 2)
-void sortColors(vector<int>& arr) {
-    int low = 0, mid = 0;
-    int high = arr.size() - 1;
+//Bài 1 :
+//Đỏ : 0, trắng : 1, xanh : 2
+void sapxep(vector<int>& arr) {
+    int x = 0, y = 0;
+    int z = arr.size() - 1;
     
-    while (mid <= high) {
-        if (arr[mid] == 0) {  // Màu đỏ (0)
-            swap(arr[low], arr[mid]);
-            low++;
-            mid++;
-        } else if (arr[mid] == 1) {  // Màu trắng (1)
-            mid++;
-        } else {  // Màu xanh (2)
-            swap(arr[mid], arr[high]);
-            high--;
+    while (y <= z) {
+        if (arr[y] == 0) {  
+            swap(arr[x], arr[y]);
+            x++;
+            y++;
+        } else if (arr[y] == 1) {  
+            y++;
+        } else {  
+            swap(arr[y], arr[z]);
+            z--;
         }
     }
 }
@@ -26,14 +27,11 @@ void sortColors(vector<int>& arr) {
 int main() {
     // Mã hóa các màu: đỏ -> 0, trắng -> 1, xanh -> 2
     vector<int> arr = {2, 0, 2, 0, 0, 1, 0, 2, 1};
-    
-    // Gọi hàm sắp xếp
-    sortColors(arr);
+    sapxep(arr);
     
     // Giải mã kết quả: 0 -> đỏ, 1 -> trắng, 2 -> xanh
     vector<string> colorMap = {"đỏ", "trắng", "xanh"};
     
-    // In kết quả sau khi sắp xếp
     cout << "{";
     for (int i = 0; i < arr.size(); i++) {
         cout << colorMap[arr[i]];
@@ -42,6 +40,103 @@ int main() {
         }
     }
     cout << "}" << endl;
+    return 0;
+}
 
+
+//Bài 2 
+//Số Blum : 4k + 3
+// Sàng Eratosthenes để tìm các số nguyên tố nhỏ hơn N
+vector<int> sieveOfEratosthenes(int N) {
+    vector<bool> isPrime(N + 1, true);
+    vector<int> primes;
+    
+    isPrime[0] = isPrime[1] = false;
+    
+    for (int i = 2; i <= N; ++i) {
+        if (isPrime[i]) {
+            primes.push_back(i);
+            for (int j = i * 2; j <= N; j += i) {
+                isPrime[j] = false;
+            }
+        }
+    }
+    return primes;
+}
+
+// Kiểm tra xem một số có phải là số Blum
+bool isPrime4k3(int p) {
+    return (p % 4 == 3);
+}
+
+// Tạo danh sách các số Blum nhỏ hơn N
+vector<int> generateBlumNumbers(int N) {
+    vector<int> primes = sieveOfEratosthenes(sqrt(N));
+    vector<int> blumNumbers;
+    
+    for (int i = 0; i < primes.size(); ++i) {
+        if (isPrime4k3(primes[i])) {
+            for (int j = i; j < primes.size(); ++j) {  
+                if (isPrime4k3(primes[j])) {
+                    int blum = primes[i] * primes[j];
+                    if (blum < N) {
+                        blumNumbers.push_back(blum);
+                    }
+                }
+            }
+        }
+    }
+    sort(blumNumbers.begin(), blumNumbers.end());
+    return blumNumbers;
+}
+
+// Kiểm tra xem số M có phải là số Blum không
+bool isBlumNumber(int M, const vector<int>& blumNumbers) {
+    return binary_search(blumNumbers.begin(), blumNumbers.end(), M);
+}
+
+// Tìm các cặp số Blum có tổng là số Blum
+void findBlumPairs(const vector<int>& blumNumbers, int N) {
+    cout << "Các cặp số Blum có tổng cũng là số Blum nhỏ hơn " << N << ":\n";
+    
+    for (int i = 0; i < blumNumbers.size(); ++i) {
+        for (int j = i + 1; j < blumNumbers.size(); ++j) {
+            int sum = blumNumbers[i] + blumNumbers[j];
+            if (sum >= N) break;  // Không cần kiểm tra nếu tổng lớn hơn N
+            if (isBlumNumber(sum, blumNumbers)) {
+                cout << "(" << blumNumbers[i] << ", " << blumNumbers[j] << ")" << endl;
+            }
+        }
+    }
+}
+
+int main() {
+    int N;
+    cout << "Nhập số N: ";
+    cin >> N;
+
+    // Tạo danh sách số Blum nhỏ hơn N
+    vector<int> blumNumbers = generateBlumNumbers(N);
+
+    // Hiển thị danh sách các số Blum
+    cout << "Các số Blum nhỏ hơn " << N << ":\n";
+    for (int blum : blumNumbers) {
+        cout << blum << " ";
+    }
+    cout << endl;
+
+    // Tìm các cặp số Blum có tổng là số Blum
+    findBlumPairs(blumNumbers, N);
+
+    // Kiểm tra một số M có phải là số Blum không
+    int M;
+    cout << "Nhập số Blum M để kiểm tra: ";
+    cin >> M;
+
+    if (isBlumNumber(M, blumNumbers)) {
+        cout << M << " là một số Blum.\n";
+    } else {
+        cout << M << " không phải là số Blum.\n";
+    }
     return 0;
 }
