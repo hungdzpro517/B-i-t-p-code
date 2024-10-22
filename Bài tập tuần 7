@@ -1,0 +1,49 @@
+#include <iostream>
+using namespace std;
+
+// Hàm trộn hai dãy a và b thành dãy c theo thứ tự tăng dần
+void mergeArrays(int a[], int n, int b[], int m, int c[]) {
+    int i = 0, j = 0, k = 0;
+
+    // So sánh và trộn các phần tử từ a và b
+    while (i < n && j < m) {
+        if (a[i] <= b[j]) {
+            c[k++] = a[i++];
+        } else {
+            c[k++] = b[j++];
+        }
+    }
+
+    // Đưa các phần tử còn lại của dãy a vào c
+    while (i < n) {
+        c[k++] = a[i++];
+    }
+
+    // Đưa các phần tử còn lại của dãy b vào c
+    while (j < m) {
+        c[k++] = b[j++];
+    }
+}
+
+int main() {
+    // Dãy a và b đã được sắp xếp
+    int a[] = {5, 7, 14, 35, 200, 301};
+    int b[] = {1, 15, 34, 79};
+
+    int n = sizeof(a) / sizeof(a[0]); // Số phần tử trong dãy a
+    int m = sizeof(b) / sizeof(b[0]); // Số phần tử trong dãy b
+
+    int c[n + m]; // Khởi tạo dãy c có kích thước n + m
+
+    // Trộn dãy a và b thành dãy c
+    mergeArrays(a, n, b, m, c);
+
+    // In dãy c
+    cout << "Dãy sau khi trộn: ";
+    for (int i = 0; i < n + m; i++) {
+        cout << c[i] << " ";
+    }
+    cout << endl;
+
+    return 0;
+}
