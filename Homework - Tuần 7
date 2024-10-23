@@ -1,0 +1,56 @@
+#include <iostream>
+using namespace std;
+void timnambangnhau(int nam[], int danso[], int n) {
+    for(int i = 0; i < n; i++) {
+        bool daIn = false;
+        for(int j = i + 1; j < n; j++) {
+            if (danso[i] == danso[j]) {
+                if (!daIn) {
+                    cout << "Cac nam co cung " << danso[i] << " nguoi sinh ra: " << nam[i];
+                    daIn = true;
+                }
+                cout << " " << nam[j];
+            }
+        }
+        if (daIn) {
+            cout << endl;
+        }
+    }
+}
+
+void timnamLonnhatvaNhonhat(int nam[], int danso[], int n) {
+    int max = 0;
+    int min = 0;
+    for(int i = 1; i < n; i++) {
+        if (danso[i] < danso[min]) {
+            min = i;
+        }
+        if (danso[i] > danso[max]) {
+            max = i;
+        }
+    }
+    cout << "Nhung nam co so luong nguoi sinh ra lon nhat: " << nam[max] <<" voi " << danso[max] << " nguoi. " << endl;
+    cout << "Nhung nam co so luong nguoi sinh ra nho nhat: " << nam[min] <<" voi " << danso[min] << " nguoi. " << endl;
+}
+int main()
+{
+  const int n = 10;
+  int nam[n];
+  int danso[n];
+  
+  for (int i = 0; i < n; i++) {
+      nam[i] = 1920 + i;
+  }
+  cout << "Nhap so luong nguoi sinh ra tu nam 1920 den 1970:" << endl;
+  for(int i = 0; i < n; i++) {
+      cout << "Nam " << nam[i] << ": ";
+      cin >> danso[i];
+  }
+  
+  timnambangnhau(nam, danso, n);
+  
+  timnamLonnhatvaNhonhat(nam, danso, n);
+  
+  return 0;
+  
+}
