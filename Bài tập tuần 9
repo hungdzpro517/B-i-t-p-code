@@ -1,0 +1,250 @@
+#include <iostream>
+#include <string>
+using namespace std;
+// Bài 1
+// Định nghĩa cấu trúc danh sách liên kết đơn
+struct File {
+    string name;
+    long long size; //byte
+    string time; //(định dạng: YYYY-MM-DD HH:MM:SS)
+    File(string n, long long s, string t) : name(n), size(s), time(t) {}
+};
+
+struct Node {
+    File data;
+    Node* next;
+    Node(File f) : data(f), next(nullptr) {}
+};
+
+struct LinkedList {
+    Node* head;
+    LinkedList() : head(nullptr) {}
+    
+    void insertFile(const File& file);
+    
+    long long calculateSize();
+    
+    void removeSmallest();
+    
+    void printFile();
+};
+
+//Hàm chèn file theo trật tự thời gian
+void LinkedList::insertFile(const File& file) {
+    Node* newNode = new Node(file);
+    if(!head || head->data.time > file.time) {
+        newNode->next = head;
+        head = newNode;
+        return;
+    }
+    Node* current = head;
+    while (current->next && current->next->data.time < file.time) {
+        current = current->next;
+    }
+    newNode->next = current->next;
+    current->next = newNode;
+}
+
+//Hàm tính tổng kích thước các file
+long long LinkedList::calculateSize() {
+    long long totalSize = 0;
+    Node* current = head;
+    while (current) {
+        totalSize += current->data.size;
+        current = current->next;
+    }
+    return totalSize;
+}
+
+// Hàm loại bỏ file kích thước nhỏ nhất
+void LinkedList::removeSmallest() {
+    if(!head) return;
+    Node* current = head;
+    Node* smallest = head;
+    Node* prev = nullptr;
+    Node* prevSmallest = nullptr;
+    
+    while (current->next) {
+        if(current->next->data.size < smallest->data.size) {
+            prevSmallest = current;
+            smallest = current->next;
+        }
+        current = current->next;
+    }
+    
+    if(!prevSmallest) {
+        head = head->next;
+    
+    } else {
+        prevSmallest->next = smallest->next;
+    }
+    delete smallest;
+}
+
+// Hàm in danh sách các file
+void LinkedList::printFile() {
+    Node* current = head;
+    while(current) {
+        cout << "File: " << current->data.name 
+             << ", Size: " << current->data.size 
+             << " bytes, Timestamp: " << current->data.time << endl;
+        current = current->next;
+    }
+}
+
+int main() {
+    LinkedList tep;
+    
+    tep.insertFile(File("file1.txt", 1024, "2023-11-17 12:00:00"));
+    tep.insertFile(File("file2.txt", 2048, "2023-11-18 10:00:00"));
+    tep.insertFile(File("file3.txt", 512, "2023-11-16 14:30:00"));
+
+    cout << "Danh sách file ban đầu:" << endl;
+    tep.printFile();
+
+    cout << "\nTổng kích thước: " << tep.calculateSize() << " bytes" << endl;
+    
+    long long usbSize = 32LL * 1024 * 1024 * 1024; // 32GB
+    while (tep.calculateSize() > usbSize) {
+        tep.removeSmallest();
+    }
+
+    cout << "\nDanh sách file sau khi loại bỏ:" << endl;
+    tep.printFile();
+
+    return 0;
+}
+
+
+//Bài 2
+#include <iostream>
+using namespace std;
+
+struct Node {
+    char word[50];
+    int count;
+    Node* next;
+
+    Node(const char* w) : count(1), next(nullptr) {
+        int i = 0;
+        while (w[i] != '\0') { 
+            word[i] = w[i]; 
+            i++; 
+        }
+        word[i] = '\0';
+    }
+};
+
+// Hàm so sánh chuỗi
+int compareStr(const char* s1, const char* s2) {
+    int i = 0;
+    while (s1[i] != '\0' && s2[i] != '\0') {
+        if (s1[i] != s2[i]) return s1[i] - s2[i];
+        i++;
+    }
+    return s1[i] - s2[i];
+}
+
+// Thêm từ vào danh sách
+void addWord(Node*& head, const char* word) {
+    for (Node* cur = head; cur; cur = cur->next) {
+        if (compareStr(cur->word, word) == 0) { 
+            cur->count++; 
+            return; 
+        }
+    }
+    Node* newNode = new Node(word);
+    newNode->next = head;
+    head = newNode;
+}
+
+// Tìm từ xuất hiện nhiều nhất
+void findMost(Node* head) {
+    if (!head) return;
+    Node* most = head;
+    for (Node* cur = head; cur; cur = cur->next) {
+        if (cur->count > most->count) most = cur;
+    }
+    cout << "Từ xuất hiện nhiều nhất: " << most->word << " (" << most->count << " lần)\n";
+}
+
+// Loại bỏ từ láy
+void removeWord(Node*& head) {
+    Node* pre = nullptr;
+    Node* cur = head;
+    while (cur) {
+        int len = 0;
+        while (cur->word[len] != '\0') len++;
+
+        bool tulay = (len % 2 == 0);
+        for (int i = 0; i < len / 2 && tulay; i++) {
+            if (cur->word[i] != cur->word[len / 2 + i]) tulay = false;
+        }
+
+        if (tulay) { // Nếu là từ láy, xóa node
+            Node* temp = cur;
+            if (pre) pre->next = cur->next;
+            else head = cur->next;
+            cur = cur->next;
+            delete temp;
+        } else { // Nếu không phải từ láy, tiếp tục duyệt
+            pre = cur;
+            cur = cur->next;
+        }
+    }
+}
+
+// Đếm số từ trong danh sách
+int countWord(Node* head) {
+    int total = 0;
+    for (Node* cur = head; cur; cur = cur->next) 
+        total += cur->count;
+    return total;
+}
+
+// In danh sách từ
+void printList(Node* head) {
+    for (Node* cur = head; cur; cur = cur->next)
+        cout << cur->word << ": " << cur->count << "\n";
+}
+
+int main() {
+    Node* head = nullptr;
+    char sentence[500], word[50];
+    cout << "Nhập câu tiếng Việt: ";
+    cin.getline(sentence, 500);
+
+    int i = 0, j = 0;
+    while (sentence[i] != '\0') {
+        if (sentence[i] == ' ') {
+            if (j > 0) { 
+                word[j] = '\0'; 
+                addWord(head, word); 
+                j = 0; 
+            }
+        } else {
+            word[j++] = sentence[i];
+        }
+        i++;
+    }
+    if (j > 0) { 
+        word[j] = '\0'; 
+        addWord(head, word); 
+    }
+
+    cout << "Danh sách từ vựng:\n";
+    printList(head);
+
+    findMost(head);
+    removeWord(head); // Loại bỏ từ láy
+    cout << "Số từ trong câu (sau loại bỏ từ láy): " << countWord(head) << "\n";
+    cout << "Danh sách từ sau khi loại bỏ từ láy:\n";
+    printList(head);
+
+    while (head) { 
+        Node* temp = head; 
+        head = head->next; 
+        delete temp; 
+    }
+    return 0;
+}
