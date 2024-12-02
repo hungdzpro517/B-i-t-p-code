@@ -1,0 +1,73 @@
+
+#include <iostream>
+#include <string>
+using namespace std;
+
+//Cau truc luu thong tin cua moi khach hang
+struct Customer {
+    string name;
+    string product;
+    int quantity;
+    double total;
+    Customer* next;
+    Customer(string n, string p, int q, double t) : name(n), product(p), quantity(q), total(t), next(nullptr) {} 
+};
+
+//Ham them khach hang vao cuoi hang doi
+void add(Customer*& front, Customer*& rear, string name, string product, int quantity, double total) {
+    Customer* newCustomer = new Customer(name, product, quantity, total);
+    if (rear == nullptr) {
+        front = rear = newCustomer;
+    } else {
+        rear->next = newCustomer;
+        rear = newCustomer;
+    }
+}
+
+//Ham loai bo khach hang dau tien khoi hang doi
+void remove(Customer*& front, Customer*& rear) {
+    if (front == nullptr) {
+        cout << "Hàng đợi đang trống" << endl;
+        return;
+    }
+    Customer* temp = front;
+    front = front->next;
+    if (front == nullptr) {
+        rear = nullptr;
+    }
+    delete temp;
+}
+
+//Ham xu li hang doi va tinh tong doanh thu
+void Count(Customer*& front, Customer*& rear) {
+    double totalRevenue = 0;
+    double totalProductA = 0;
+    while (front != nullptr) {
+        cout << "Khách hàng " << front->name << " mua " << front->quantity
+             << " sản phẩm " << front->product << " với " << front->total << " VND" << endl;
+        totalRevenue += front->total;
+        
+        if(front->product == "A") {
+            totalProductA += front->quantity;
+        }
+        
+        remove(front, rear);
+    }
+    cout << "\nTổng doanh thu: " << totalRevenue << " VND" << endl;
+    cout << "Tổng lượng sản phẩm A được bán: " << totalProductA << " cái" << endl;
+}
+
+int main() {
+    Customer* front = nullptr; // Con trỏ đầu hàng đợi
+    Customer* rear = nullptr;  // Con trỏ cuối hàng đợi
+
+    // Thêm khách hàng vào hàng đợi
+    add(front, rear, "Hùng", "A", 2, 200.0);
+    add(front, rear, "Hân", "B", 1, 150.0);
+    add(front, rear, "Linh", "A", 3, 300.0);
+
+    // Xử lý hàng đợi và hiển thị kết quả
+    Count(front, rear);
+
+    return 0;
+}
