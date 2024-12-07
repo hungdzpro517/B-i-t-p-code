@@ -1,0 +1,98 @@
+#include <iostream>
+using namespace std;
+
+// Cấu trúc Node cho cây biểu thức
+struct Node {
+    char data;    // Giá trị của node
+    Node* left;   // Con trái
+    Node* right;  // Con phải
+    Node(char val) : data(val), left(nullptr), right(nullptr) {}
+};
+
+//Kiểm tra toán tử
+bool Toantu(char c) {
+    return (c == '+' || c == '-' || c == '*' || c == '/' || c == '^');
+}
+
+//Kiểm tra toán hạng
+bool Toanhang(char c) {
+    return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9');
+}
+
+// Xây dựng cây biểu thức từ biểu thức hậu tố
+Node* xaydungCay(string postfix) {
+    Node* stack[postfix.length()];
+    int top = -1;
+
+    // Duyệt qua từng ký tự của biểu thức hậu tố
+    for (char token : postfix) {
+        // Nếu là toán hạng (số hoặc biến), tạo node và đẩy vào stack
+        if (Toanhang(token)) {
+            stack[++top] = new Node(token);
+        } 
+        // Nếu là toán tử, lấy hai toán hạng từ stack và tạo cây con
+        else if (Toantu(token)) {
+            Node* right = stack[top--];
+            Node* left = stack[top--];
+            Node* node = new Node(token);
+            node->left = left;
+            node->right = right;
+            stack[++top] = node; // Đẩy node mới tạo vào stack
+        }
+    }
+    // Phần tử duy nhất còn lại trong stack là gốc cây
+    return stack[top];
+}
+
+// Duyệt cây theo dạng Trung tố 
+void duyetTrungto(Node* root) {
+    if (root == nullptr) return;
+
+    // Nếu là toán tử, thêm dấu ngoặc để đảm bảo đúng thứ tự toán tử
+    if (Toantu(root->data)) cout << "(";
+    
+    duyetTrungto(root->left);  
+    cout << root->data << " ";  
+    duyetTrungto(root->right);  
+    
+    if (Toantu(root->data)) cout << ")";
+}
+
+// Duyệt cây theo dạng Tiền tố 
+void duyetTiento(Node* root) {
+    if (root == nullptr) return;
+    
+    cout << root->data << " ";  
+    duyetTiento(root->left);  
+    duyetTiento(root->right);  
+}
+
+// Duyệt cây theo dạng Hậu tố 
+void duyetHauto(Node* root) {
+    if (root == nullptr) return;
+    
+    duyetHauto(root->left);  
+    duyetHauto(root->right);  
+    cout << root->data << " "; 
+}
+
+int main() {
+    string postfix = "a5*bc6^*d/-hf-e12/^*+";
+    
+    // Xây dựng cây từ biểu thức hậu tố
+    Node* root = xaydungCay(postfix);
+    
+    cout << "Duyệt cây theo dạng Trung tố: ";
+    duyetTrungto(root);
+    cout << endl;
+    
+    cout << "Duyệt cây theo dạng Tiền tố: ";
+    duyetTiento(root);
+    cout << endl;
+    
+    cout << "Duyệt cây theo dạng Hậu tố: ";
+    duyetHauto(root);
+    cout << endl;
+    
+    return 0;
+}
