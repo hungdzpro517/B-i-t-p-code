@@ -1,0 +1,132 @@
+
+#include <iostream>
+#include <string>
+using namespace std;
+
+struct Node {
+    string title;
+    int pages;
+    Node* first;
+    Node* next;
+    Node(const string& t, int p) : title(t), pages(p), first(nullptr), next(nullptr) {}
+    
+    ~Node() {
+        delete first;
+        delete next;
+    }
+};
+
+//Tinh so chuong sach
+int countChap(Node* root) {
+    if(!root) return 0;
+    
+    int count = 0;
+    Node* cur = root->first;
+    while (cur) {
+        ++count;
+        cur = cur->next;
+    }
+    return count;
+}
+
+//Tim chuong dai nhat cuon sach
+Node* findLongest(Node*root) {
+    if(!root || !root->first) return nullptr;
+    
+    Node* longestChap = nullptr;
+    int max = 0;
+    Node* cur = root->first;
+    while(cur) {
+        if(cur->pages > max) {
+            max = cur->pages;
+            longestChap = cur;
+        }
+        cur = cur->next;
+    }
+    return longestChap;
+}
+
+//Tim va xoa mot muc khoi cay
+bool FindDelete(Node* root, const string& target) {
+    if(!root || !root->first) return false;
+    
+    Node* cur = root->first;
+    Node* prev = nullptr;
+    
+    while(cur) {
+        if(cur->title == target) {
+            if(prev) {
+                prev->next = cur->next;
+            } else {
+                root->first = cur->next;
+            }
+            cur->next = nullptr;
+            delete cur;
+            return true;
+        }
+        if (FindDelete(cur, target)) {
+            return true;
+        }
+        prev = cur;
+        cur = cur->next;
+    }
+    return false;
+}
+//Ham kiem tra 
+void printTree(Node* root, int level = 0) {
+    if (!root) return;
+    
+    for(int i = 0; i < level; i++) {
+        cout << " ";
+    }
+    cout << root->title << " (" << root->pages << " trang)\n";
+    Node* cur = root->first;
+    while (cur) {
+        printTree(cur, level + 1);
+        cur = cur->next;
+    }
+}
+
+int main() {
+    Node* book = new Node("Tieu de sach", 0);
+    
+    Node* chap1 = new Node("Chuong 1", 35);
+    Node* chap2 = new Node("Chuong 2", 40);
+    Node* chap3 = new Node("Chuong 3", 45);
+    
+    Node* section11 = new Node("Muc 1.1", 20);
+    Node* section12 = new Node("Muc 1.2", 15);
+    Node* section21 = new Node("Muc 2.1", 20);
+    Node* section22 = new Node("Muc 2.2", 20);
+    
+    book->first = chap1;
+    chap1->next = chap2;
+    chap2->next = chap3;
+    
+    chap1->first = section11;
+    section11->next = section12;
+    
+    chap2->first = section21;
+    section21->next = section22;
+    
+    cout << "Cay muc luc:\n";
+    printTree(book);
+    
+    //Tim so chuong
+    cout << "\nSo chuong cua sach: " << countChap(book) << "\n";
+    
+    //Tim chuong dai nhat
+    Node* longestChap = findLongest(book);
+    if (longestChap) {
+        cout << "Chuong dai nhat: " << longestChap->title << " co " << longestChap->pages << " trang\n";
+    }
+     //Tim va xoa muc chuong 3
+     if(FindDelete(book, "Chuong 3")) {
+         cout << "Sau khi xoa chuong 3: ";
+         printTree(book);
+     } else {
+         cout << "\nChuong 2 khong duoc tim thay.\n";
+     }
+     delete book;
+     return 0;
+}
