@@ -1,0 +1,155 @@
+#include <iostream>
+using namespace std;
+
+// Cấu trúc của một node trong cây AVL
+struct Node {
+    int value;
+    Node* left;
+    Node* right;
+    int height;
+
+    Node(int val) : value(val), left(nullptr), right(nullptr), height(1) {}
+};
+
+//Hàm tính chiều cao của Node
+int calHeight(Node* node) {
+    return node ? node->height : 0;
+}
+
+//Hàm tính hệ số cân bằng của node
+int getBalance(Node* node) {
+    return node ? calHeight(node->left) - calHeight(node->right) : 0;
+}
+
+//Hàm cập nhật chiều cao của node
+void updateHeight(Node* node) {
+    if(node) {
+        node->height = 1 + max(calHeight(node->left), calHeight(node->right));
+    }
+}
+
+//Xoay phải
+Node* rotateRight(Node* y) {
+    Node* x = y->left;
+    Node* t = x->right;
+    x->right = y;
+    y->left = t;
+    updateHeight(x);
+    updateHeight(y);
+    return y;
+}
+
+// Xoay trái (Left Rotate)
+Node* rotateLeft(Node* x) {
+    Node* y = x->right;
+    Node* T = y->left;
+
+    y->left = x;
+    x->right = T;
+
+    updateHeight(x);
+    updateHeight(y);
+
+    return y;
+}
+
+// Hàm cân bằng node
+Node* balance(Node* node) {
+    updateHeight(node);
+
+    int balanceFactor = getBalance(node);
+
+    // Mất cân bằng bên trái
+    if (balanceFactor > 1) {
+        if (getBalance(node->left) < 0) {
+            node->left = rotateLeft(node->left);
+        }
+        return rotateRight(node);
+    }
+ // Mất cân bằng bên phải
+    if (balanceFactor < -1) {
+        if (getBalance(node->right) > 0) {
+            node->right = rotateRight(node->right);
+        }
+        return rotateLeft(node);
+    }
+
+    return node;
+}
+
+// Hàm thêm node mới vào cây AVL
+Node* insert(Node* root, int value) {
+    if (!root) return new Node(value);
+
+    if (value < root->value) {
+        root->left = insert(root->left, value);
+    } else if (value > root->value) {
+        root->right = insert(root->right, value);
+    } else {
+        // Không cho phép giá trị trùng lặp
+        return root;
+    }
+
+    return balance(root);
+}
+
+// Hàm duyệt cây theo thứ tự giữa (In-order Traversal)
+void inOrderTraversal(Node* root) {
+    if (root) {
+        inOrderTraversal(root->left);
+        cout << root->value << " ";
+        inOrderTraversal(root->right);
+    }
+}
+
+// Hàm duyệt cây theo thứ tự trước (Pre-order Traversal)
+void preOrderTraversal(Node* root) {
+    if (root) {
+        cout << root->value << " ";
+        preOrderTraversal(root->left);
+        preOrderTraversal(root->right);
+    }
+}
+
+// Hàm duyệt cây theo thứ tự sau (Post-order Traversal)
+void postOrderTraversal(Node* root) {
+    if (root) {
+        postOrderTraversal(root->left);
+        postOrderTraversal(root->right);
+        cout << root->value << " ";
+    }
+}
+
+// Hàm main
+int main() {
+    Node* root = nullptr;
+
+    int n;
+    cout << "Nhập số lượng phần tử: ";
+    cin >> n;
+
+    cout << "Nhập các phần tử: ";
+    for (int i = 0; i < n; ++i) {
+        int value;
+        cin >> value;
+        root = insert(root, value);
+    }
+
+    cout << "Cây AVL (duyệt theo thứ tự giữa): ";
+    inOrderTraversal(root);
+    cout << endl;
+
+    cout << "Cây AVL (duyệt theo thứ tự trước): ";
+    preOrderTraversal(root);
+    cout << endl;
+
+    cout << "Cây AVL (duyệt theo thứ tự sau): ";
+    postOrderTraversal(root);
+    cout << endl;
+
+    return 0;
+}
+
+
+
+
