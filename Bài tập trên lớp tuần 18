@@ -1,0 +1,67 @@
+#include <iostream>
+using namespace std;
+
+const int MAX_VERTICES = 8; // Số đỉnh tối đa
+
+// Hàm hiển thị ma trận kề
+void displayAdjMatrix(int adjMatrix[MAX_VERTICES][MAX_VERTICES], int numVertices) {
+    for (int i = 0; i < numVertices; i++) {
+        for (int j = 0; j < numVertices; j++) {
+            cout << adjMatrix[i][j] << " ";
+        }
+        cout << endl;
+    }
+}
+
+// Hàm hiển thị danh sách kề
+void displayAdjList(int adjList[MAX_VERTICES][MAX_VERTICES], int listSizes[MAX_VERTICES], int numVertices) {
+    for (int i = 0; i < numVertices; i++) {
+        cout << "Đỉnh " << i << ": ";
+        for (int j = 0; j < listSizes[i]; j++) {
+            cout << adjList[i][j] << " ";
+        }
+        cout << endl;
+    }
+}
+
+int main() {
+    // Số đỉnh của đồ thị
+    const int numVertices = 8;
+
+    // Ma trận kề
+    int adjMatrix[MAX_VERTICES][MAX_VERTICES] = {0};
+
+    // Danh sách các cạnh (đỉnh u, v)
+    int edges[][2] = {
+        {0, 1}, {0, 3}, {1, 2}, {1, 4}, {2, 5}, {3, 4}, {4, 5}, {4, 6}, {5, 7}
+    };
+    int numEdges = sizeof(edges) / sizeof(edges[0]);
+
+    // Cài đặt ma trận kề
+    for (int i = 0; i < numEdges; i++) {
+        int u = edges[i][0];
+        int v = edges[i][1];
+        adjMatrix[u][v] = 1;
+        adjMatrix[v][u] = 1; // Đồ thị vô hướng
+    }
+
+    // Hiển thị ma trận kề
+    cout << "Ma trận kề:\n";
+    displayAdjMatrix(adjMatrix, numVertices);
+
+    // Cài đặt danh sách kề
+    int adjList[MAX_VERTICES][MAX_VERTICES] = {0};
+    int listSizes[MAX_VERTICES] = {0};
+    for (int i = 0; i < numEdges; i++) {
+        int u = edges[i][0];
+        int v = edges[i][1];
+        adjList[u][listSizes[u]++] = v;
+        adjList[v][listSizes[v]++] = u; // Đồ thị vô hướng
+    }
+
+    // Hiển thị danh sách kề
+    cout << "\nDanh sách kề:\n";
+    displayAdjList(adjList, listSizes, numVertices);
+
+    return 0;
+}
