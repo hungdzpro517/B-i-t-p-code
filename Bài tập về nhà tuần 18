@@ -1,0 +1,96 @@
+#include <iostream>
+
+using namespace std;
+
+const int MAX_NODES = 11;
+
+// Ma tran lan can
+int adjMatrix[MAX_NODES][MAX_NODES] = {0};
+
+// Them canh vao ma tran lan can
+void addEdge(int u, int v) {
+    adjMatrix[u][v] = 1;
+    adjMatrix[v][u] = 1; // Do thi vo huong
+}
+
+// Duyet BFS
+void bfs(int start, int numNodes) {
+    bool visited[MAX_NODES] = {false};
+    int queue[MAX_NODES], front = 0, rear = 0;
+    
+    queue[rear++] = start;
+    visited[start] = true;
+
+    cout << "Thu tu duyet BFS: ";
+
+    while (front < rear) {
+        int node = queue[front++];
+        cout << node << " ";
+
+        for (int i = 0; i < numNodes; ++i) {
+            if (adjMatrix[node][i] && !visited[i]) {
+                visited[i] = true;
+                queue[rear++] = i;
+            }
+        }
+    }
+    cout << endl;
+}
+
+// Duyet DFS
+void dfs(int start, int numNodes) {
+    bool visited[MAX_NODES] = {false};
+    int stack[MAX_NODES], top = -1;
+
+    stack[++top] = start;
+
+    cout << "Thu tu duyet DFS: ";
+
+    while (top >= 0) {
+        int node = stack[top--];
+
+        if (!visited[node]) {
+            visited[node] = true;
+            cout << node << " ";
+
+            for (int i = numNodes - 1; i >= 0; --i) {
+                if (adjMatrix[node][i] && !visited[i]) {
+                    stack[++top] = i;
+                }
+            }
+        }
+    }
+    cout << endl;
+}
+
+int main() {
+    int numNodes = 11;
+
+    // Them canh vao do thi
+    addEdge(0, 1);
+    addEdge(0, 2);
+    addEdge(0, 3);
+    addEdge(0, 4);
+    addEdge(0, 9);
+    addEdge(0, 10);
+    addEdge(9, 10);
+    addEdge(9, 8);
+    addEdge(8, 7);
+    addEdge(7, 6);
+    addEdge(6, 5);
+    addEdge(5, 4);
+    addEdge(4, 3);
+
+    cout << "Ma tran lan can:" << endl;
+    for (int i = 0; i < numNodes; ++i) {
+        for (int j = 0; j < numNodes; ++j) {
+            cout << adjMatrix[i][j] << " ";
+        }
+        cout << endl;
+    }
+
+    bfs(0, numNodes); // Bat dau tu dinh 0 (Ha Noi)
+    dfs(0, numNodes);
+
+    return 0;
+}
